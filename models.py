@@ -1,4 +1,5 @@
 from .database import Base
+from flask import jsonify
 from flask_security import UserMixin, RoleMixin, AsaList
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.mutable import MutableList
@@ -17,6 +18,8 @@ class Role(Base, RoleMixin):
     name = Column(String(80), unique=True)
     description = Column(String(255))
     permissions = Column(MutableList.as_mutable(AsaList()), nullable=True)
+    def to_dict(self):
+        return {'id': self.id, 'name': self.name, 'description': self.description, 'permissions': self.permissions}
 
 class User(Base, UserMixin):
     __tablename__ = 'users'
@@ -32,5 +35,9 @@ class User(Base, UserMixin):
     active = Column(Boolean())
     fs_uniquifier = Column(String(64), unique=True, nullable=False)
     confirmed_at = Column(DateTime())
-    roles = relationship('Role', secondary='roles_users',
-                         backref=backref('users', lazy='dynamic'))
+    roles = relationship('Role', secondary='roles_users',backref=backref('users', lazy='dynamic'))
+    def to_dict(self):
+        props = {'id': self.id, 'email': self.email, 'username': self.username, 'last_login_at': self.last_login_at, 'current_login_ip':
+        self.current_login_ip, 'login_count': self.login_count, 'active': self.active, 'confirmed_at': self.confirmed_at}
+        return props
+    

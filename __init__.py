@@ -24,6 +24,7 @@ def create_app():
 
     ##
     app.config['WTF_CSRF_CHECK_DEFAULT'] = False
+    app.config['SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS'] = True
     app.config['SECURITY_CSRF_PROTECT_MECHANISMS'] = ["session", "basic"]
     ##
 
