@@ -50,10 +50,13 @@ def create_app():
         app.security.datastore.find_or_create_role(
             name="user", permissions={"user-read", "user-write"}
         )
+        app.security.datastore.find_or_create_role(
+            name="warehouse", permissions={"warehouse-read", "warehouse-write"}
+        )
         db_session.commit()
         if not app.security.datastore.find_user(email="test@me.com"):
             app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user"])        
+            password=hash_password("password"), roles=["user","warehouse"])        
         db_session.commit()
 
         db_session.add(Warehouse(warehouse_name='1'))

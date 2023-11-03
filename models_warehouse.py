@@ -15,23 +15,38 @@ class Warehouse(Base):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f'<Warehouse {self.warehouse_name}>'
+        return f'{self.warehouse_name}>'
 
 class Partner(Base):
     __tablename__ = 'partners'
     partner_id = Column(Integer, primary_key=True, autoincrement=True)
     partner_name = Column(String(80))
+    def to_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def __repr__(self):
+        return f'{self.warehouse_name}>'
 
 class Agreement(Base):
-   __tablename__ = 'agreements'
-   agreement_id = Column(Integer(), primary_key=True, autoincrement=True)
-   partner_id = Column('partner_id', Integer(), ForeignKey('partners'))
-   agreement_name = Column(String(80))
+    __tablename__ = 'agreements'
+    agreement_id = Column(Integer(), primary_key=True, autoincrement=True)
+    partner_id = Column('partner_id', Integer(), ForeignKey('partners'))
+    agreement_name = Column(String(80))
+    def to_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def __repr__(self):
+        return f'{self.warehouse_name}>'
 
 class DeliveryOperation(Base):
     __tablename__ = 'delivery_operations'
     delivery_operation_id = Column(Integer, primary_key=True, autoincrement=True)
     delivery_operation_name = Column(String(80))
+    def to_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def __repr__(self):
+        return f'{self.warehouse_name}>'
 
 class Item(Base):
     __tablename__ = 'items'
@@ -42,6 +57,11 @@ class Item(Base):
     item_price = Column(Integer(), unique=False) # incl VAT
     item_price_vat = Column(Integer(), unique=False, default=20)
     delivery_id = Column('delivery_id', Integer(), ForeignKey('deliveries'))
+    def to_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def __repr__(self):
+        return f'{self.warehouse_name}>'
 
 class Delivery(Base):
     __tablename__ = 'deliveries'
@@ -53,3 +73,8 @@ class Delivery(Base):
     delivery_operation_id = Column('delivery_operation_id', Integer(), ForeignKey('delivery_operations'))
     warehouse_id = Column('warehouse_id', Integer(), ForeignKey('warehouses'))
     items = relationship('Item', backref=backref('deliveries'))
+    def to_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def __repr__(self):
+        return f'{self.warehouse_name}>'
