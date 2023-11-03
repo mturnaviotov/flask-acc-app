@@ -4,9 +4,14 @@ from dotenv import load_dotenv, dotenv_values
 from flask import Flask, render_template, render_template_string
 from flask_security import Security, current_user, auth_required, hash_password, \
      SQLAlchemySessionUserDatastore, permissions_accepted, roles_accepted
+
 from flask_wtf.csrf import CSRFProtect
+
 csrf = CSRFProtect()
 from .database import db_session, init_db
+
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
 
 load_dotenv('.env')
 
@@ -34,6 +39,10 @@ def create_app():
     user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
     app.security = Security(app, user_datastore)
 
+    from .models_warehouse import Warehouse, Partner, Agreement, Item, DeliveryOperation, Delivery
+#    warehouse_datastore = db_session.connection
+    #.add_all( Warehouse, Partner, Agreement, Item, DeliveryOperation, Delivery)
+
     # one time setup
     with app.app_context():
         init_db()
@@ -44,16 +53,27 @@ def create_app():
         db_session.commit()
         if not app.security.datastore.find_user(email="test@me.com"):
             app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user"])
+            password=hash_password("password"), roles=["user"])        
+        db_session.commit()
+
+        db_session.add(Warehouse(warehouse_name='1'))
+        db_session.commit()
+        db_session.add(Partner(partner_name='1'))
+        db_session.commit()
+        db_session.add(Agreement(partner_id=1,agreement_name='1'))
+        db_session.commit()
+        db_session.add(DeliveryOperation(delivery_operation_name='Income'))
+        db_session.commit()
+        db_session.add(DeliveryOperation(delivery_operation_name='Outcome'))
         db_session.commit()
 
     # blueprint for non-auth parts of app
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    # blueprint for non-auth parts of app
-    #from .auth import auth as auth_blueprint
-    #app.register_blueprint(auth_blueprint)
+    #blueprint for non-auth parts of app
+    from .warehouse import warehouse as warehouse_blueprint
+    app.register_blueprint(warehouse_blueprint)
 
 ### Error hanlders 
 

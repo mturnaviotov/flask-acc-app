@@ -1,16 +1,17 @@
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, login_required, logout_user
-from .models import User
-#from . import db
+from flask import Blueprint, render_template, redirect, url_for, request, flash, render_template_string, jsonify
+from flask_security import auth_required, permissions_accepted, roles_accepted
 import uuid
+from .database import db_session
+from .models_warehouse import Warehouse
+warehouse = Blueprint('warehouse', __name__)
 
-auth = Blueprint('auth', __name__)
-
-#@auth.route('/login')
-#def login():
-#    return render_template('auth/login.html')
+wh='/warehouse'
+@warehouse.route(wh+'/all')
+def all():
+    i = db_session.query(Warehouse).all()
+    print('i',i)
+    return jsonify(i)
 
 # @auth.route('/login', methods=['POST'])
 # def login_post():
