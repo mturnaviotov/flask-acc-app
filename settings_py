@@ -1,0 +1,9 @@
+FLASK_DATABASE_URL="sqlite:///data.db"
+FLASK_APP=.
+FLASK_ENV=development
+FLASK_DEBUG=True
+FLASK_TESTING=True
+
+FLASK_SECRET_KEY=qweaeasdfsd
+
+

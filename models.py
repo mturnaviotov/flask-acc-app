@@ -1,4 +1,4 @@
-from database import Base
+from .database import Base
 from flask_security import UserMixin, RoleMixin, AsaList
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.mutable import MutableList
