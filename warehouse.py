@@ -1,17 +1,32 @@
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash, render_template_string, jsonify
 from flask_security import auth_required, permissions_accepted, roles_accepted
+from markupsafe import escape
 import uuid
+
 from .database import db_session
 from .models_warehouse import Warehouse
 warehouse = Blueprint('warehouse', __name__)
 
 wh='/warehouse'
-@warehouse.route(wh+'/all')
-def all():
-    i = db_session.query(Warehouse).all()
-    print('i',i)
-    return jsonify(i)
+
+@warehouse.route(wh+'/<int:warehouse_id>')
+@auth_required()
+@roles_accepted("user")
+def get(warehouse_id):
+    item = Warehouse.query.filter_by(warehouse_id=escape(warehouse_id)).first().to_dict()
+    return jsonify(item)
+
+@warehouse.route(wh)
+@auth_required()
+@roles_accepted("user")
+def index():
+#    i = db_session.query(Warehouse).all()
+    all = Warehouse.query.all() #filter_by(warehouse_id='1')
+    arr = []
+    for item in all:
+        arr.append(item.to_dict())
+    return jsonify(arr)
 
 # @auth.route('/login', methods=['POST'])
 # def login_post():

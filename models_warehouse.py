@@ -1,5 +1,6 @@
 from datetime import date
 from .database import Base
+
 #from flask_security import UserMixin, RoleMixin, AsaList
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.mutable import MutableList
@@ -10,6 +11,11 @@ class Warehouse(Base):
     __tablename__ = 'warehouses'
     warehouse_id = Column(Integer, primary_key=True, autoincrement=True)
     warehouse_name = Column(String(80))
+    def to_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def __repr__(self):
+        return f'<Warehouse {self.warehouse_name}>'
 
 class Partner(Base):
     __tablename__ = 'partners'
