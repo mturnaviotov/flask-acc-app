@@ -14,12 +14,11 @@ load_dotenv('.env')
 def create_app():
     app = Flask(__name__)
     config = dotenv_values()
-    print(config)
     app.config.from_mapping(config)
 
     ##
-    #app.config['WTF_CSRF_CHECK_DEFAULT'] = False
-    #app.config['SECURITY_CSRF_PROTECT_MECHANISMS'] = ["session", "basic"]
+    app.config['WTF_CSRF_CHECK_DEFAULT'] = False
+    app.config['SECURITY_CSRF_PROTECT_MECHANISMS'] = ["session", "basic"]
     ##
 
     from .models import User, Role
