@@ -1,0 +1,3 @@
+.DS_Store
+flask.sqlite
+__pycache__/*
