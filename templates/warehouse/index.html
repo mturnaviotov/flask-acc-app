@@ -1,19 +1,18 @@
 {% extends "_base.html" %}
 {% block content %}
 <h1 class="title">
-  Partners
+  Warehouses
 </h1>
 <div>
   <b>
-    <a href="{{url_for('partner.create_page') }}">Create</a>
+    <a href="{{url_for('warehouse.create_page') }}">Create</a>
   </b>
 </div>
 <br>
-
 {% for item in items %}
   <div>
-      <p>name: {{ item.partner_name }} <a href="{{url_for('partner.get',id=item.partner_id) }}">Details</a>
-      <form action="{{url_for('partner.delete',id=item['partner_id'])}}" method="post">
+    <p>name: {{ item.warehouse_name }} <a href="{{url_for('warehouse.get',id=item.warehouse_id) }}">Details</a>
+      <form action="{{url_for('warehouse.delete',id=item['warehouse_id'])}}" method="post">
         <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input class="danger" type="submit" value="Delete" onclick="confirm('Are you sure?');">
       </form>    

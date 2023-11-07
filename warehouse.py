@@ -7,42 +7,42 @@ from .database import db_session
 from .models_warehouse import Warehouse
 warehouse = Blueprint('warehouse', __name__)
 
-wh='/warehouse'
+route_pref='warehouse'
 
-@warehouse.route(wh+'/<int:id>')
+@warehouse.route('/'+route_pref+'/<int:id>')
 @auth_required()
-@roles_accepted("warehouse")
+@roles_accepted(route_pref)
 def get(id):
     item = Warehouse.query.filter_by(warehouse_id=escape(id)).first().to_dict()
-    return render_template('wh/item.html', item=item)
+    return render_template('/'+route_pref+'/item.html', item=item)
 
-@warehouse.route(wh+'/<int:warehouse_id>/json')
+@warehouse.route('/'+route_pref+'/<int:id>/json')
 @auth_required()
-@roles_accepted("warehouse")
+@roles_accepted(route_pref)
 def get_json(id):
     item = Warehouse.query.filter_by(warehouse_id=escape(id)).first().to_dict()
     return jsonify(item)
 
-@warehouse.route(wh)
+@warehouse.route('/'+route_pref)
 @auth_required()
-@roles_accepted("warehouse")
+@roles_accepted(route_pref)
 def index():
 #    i = db_session.query(Warehouse).all()
     all = Warehouse.query.all()
     arr = []
     for item in all:
         arr.append(item.to_dict())
-    return render_template('wh/index.html', items=arr)
+    return render_template('/'+route_pref+'/index.html', items=arr)
 
-@warehouse.route(wh+'/create') #, methods=['POST'])
+@warehouse.route('/'+route_pref+'/create') #, methods=['POST'])
 @auth_required()
-@roles_accepted("warehouse")
+@roles_accepted(route_pref)
 def create_page():
-    return render_template('wh/create.html')
+    return render_template('/'+route_pref+'/create.html')
 
-@warehouse.route(wh+'/json')
+@warehouse.route('/'+route_pref+'/json')
 @auth_required()
-@roles_accepted("warehouse")
+@roles_accepted(route_pref)
 def index_json():
     all = Warehouse.query.all()
     arr = []
@@ -50,9 +50,9 @@ def index_json():
         arr.append(item.to_dict())
     return jsonify(arr)
 
-@warehouse.route(wh, methods=['POST'])
+@warehouse.route('/'+route_pref, methods=['POST'])
 @auth_required()
-@roles_accepted("warehouse")
+@roles_accepted(route_pref)
 def create():
 #     # code to validate before database goes here
     name = request.form.get('name')
@@ -64,9 +64,9 @@ def create():
     flash('Data saved')
     return redirect(url_for('warehouse.index'))
 
-@warehouse.route(wh+'/<int:id>/delete', methods=['POST'])
+@warehouse.route('/'+route_pref+'/<int:id>/delete', methods=['POST'])
 @auth_required()
-@roles_accepted("warehouse")
+@roles_accepted(route_pref)
 def delete(id):
     item = Warehouse.query.filter_by(warehouse_id=escape(id)).first()
     db_session.delete(item)

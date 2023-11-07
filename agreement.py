@@ -4,75 +4,79 @@ from flask_security import auth_required, permissions_accepted, roles_accepted
 from markupsafe import escape
 
 from .database import db_session
-from .models_warehouse import Partner
-partner = Blueprint('partner', __name__)
+from .models_warehouse import Agreement, Partner
+agreement = Blueprint('agreement', __name__)
 
-route_pref='partner'
+route_pref='agreement'
 
-@partner.route('/'+route_pref+'/<int:id>')
+@agreement.route('/'+route_pref+'/<int:id>')
 @auth_required()
 @roles_accepted(route_pref)
 def get(id):
-    item = Partner.query.filter_by(partner_id=escape(id)).first().to_dict()
-    return render_template(route_pref+'/item.html', item=item)
+    item = Agreement.query.filter_by(agreement_id=escape(id)).first()
+    partner = Partner.query.filter_by(partner_id=item.partner_id).first().to_dict()
+    
+    return render_template(route_pref+'/item.html', item=item.to_dict(), partner=partner)
 
-@partner.route('/'+route_pref+'/<int:id>/json')
+@agreement.route('/'+route_pref+'/<int:id>/json')
 @auth_required()
 @roles_accepted(route_pref)
 def get_json(id):
-    item = partner.query.filter_by(partner_id=escape(id)).first().to_dict()
+    item = Agreement.query.filter_by(agreement_id=escape(id)).first().to_dict()
+    print(item)
     return jsonify(item)
 
-@partner.route('/'+route_pref)
+@agreement.route('/'+route_pref)
 @auth_required()
 @roles_accepted(route_pref)
 def index():
 #    i = db_session.query(partner).all()
-    all = Partner.query.all()
+    all = Agreement.query.all()
     arr = []
     for item in all:
         arr.append(item.to_dict())
     return render_template('/'+route_pref+'/index.html', items=arr)
 
-@partner.route('/'+route_pref+'/create') #, methods=['POST'])
+@agreement.route('/'+route_pref+'/create') #, methods=['POST'])
 @auth_required()
 @roles_accepted(route_pref)
 def create_page():
     return render_template('/'+route_pref+'/create.html')
 
-@partner.route('/'+route_pref+'/json')
+@agreement.route('/'+route_pref+'/json')
 @auth_required()
 @roles_accepted(route_pref)
 def index_json():
-    all = Partner.query.all()
+    all = Agreement.query.all()
     arr = []
     for item in all:
         arr.append(item.to_dict())
     return jsonify(arr)
 
-@partner.route('/'+route_pref, methods=['POST'])
+@agreement.route('/'+route_pref, methods=['POST'])
 @auth_required()
 @roles_accepted(route_pref)
 def create():
 #     # code to validate before database goes here
     name = request.form.get('name')
-    item = Partner(partner_name=escape(name))
+    partner_id = request.form.get('partner_id')
+    item = Agreement(agreement_name=escape(name), partner_id=escape(partner_id))
 
 #     # add the new item to the database
     db_session.add(item)
     db_session.commit()
     flash('Data saved')
-    return redirect(url_for('partner.index'))
+    return redirect(url_for('agreement.index'))
 
-@partner.route('/'+route_pref+'/<int:id>/delete', methods=['POST'])
+@agreement.route('/'+route_pref+'/<int:id>/delete', methods=['POST'])
 @auth_required()
 @roles_accepted(route_pref)
 def delete(id):
-    item = Partner.query.filter_by(partner_id=escape(id)).first()
+    item = Agreement.query.filter_by(partner_id=escape(id)).first()
     db_session.delete(item)
     db_session.commit()
     flash('Data deleted')
-    return redirect(url_for('partner.index'))
+    return redirect(url_for('agreement.index'))
 
 #     return redirect(url_for('auth.login'))
 ###########################################

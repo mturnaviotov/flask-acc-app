@@ -56,11 +56,14 @@ def create_app():
         app.security.datastore.find_or_create_role(
             name="partner", permissions={"partner-read", "partner-write"}
         )
+        app.security.datastore.find_or_create_role(
+            name="agreement", permissions={"agreement-read", "agreement-write"}
+        )
         db_session.commit()
 
         if not app.security.datastore.find_user(email="test@me.com"):
             app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user","warehouse", "partner"])        
+            password=hash_password("password"), roles=["user","warehouse", "partner","agreement"])        
 
         db_session.commit()
 ############## 
@@ -92,9 +95,15 @@ def create_app():
     from .warehouse import warehouse as warehouse_blueprint
     app.register_blueprint(warehouse_blueprint)
 
+
     #blueprint for non-auth parts of app
     from .partner import partner as partner_blueprint
     app.register_blueprint(partner_blueprint)
+    #blueprint for non-auth parts of app
+
+
+    from .agreement import agreement as agreement_blueprint
+    app.register_blueprint(agreement_blueprint)
 
 ### Error hanlders 
 
