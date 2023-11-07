@@ -53,22 +53,36 @@ def create_app():
         app.security.datastore.find_or_create_role(
             name="warehouse", permissions={"warehouse-read", "warehouse-write"}
         )
-        db_session.commit()
-        if not app.security.datastore.find_user(email="test@me.com"):
-            app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user","warehouse"])        
+        app.security.datastore.find_or_create_role(
+            name="partner", permissions={"partner-read", "partner-write"}
+        )
         db_session.commit()
 
-        db_session.add(Warehouse(warehouse_name='1'))
+        if not app.security.datastore.find_user(email="test@me.com"):
+            app.security.datastore.create_user(email="test@me.com",
+            password=hash_password("password"), roles=["user","warehouse", "partner"])        
+
         db_session.commit()
-        db_session.add(Partner(partner_name='1'))
+############## 
+        if not Warehouse.query.filter_by(warehouse_name='1').count() == 1:
+            db_session.add(Warehouse(warehouse_name='1'))
+            db_session.commit()
+        
         db_session.commit()
-        db_session.add(Agreement(partner_id=1,agreement_name='1'))
-        db_session.commit()
-        db_session.add(DeliveryOperation(delivery_operation_name='Income'))
-        db_session.commit()
-        db_session.add(DeliveryOperation(delivery_operation_name='Outcome'))
-        db_session.commit()
+        if not Partner.query.filter_by(partner_name='1').count() == 1:
+            db_session.add(Partner(partner_name='1'))
+            db_session.commit()
+        if not Agreement.query.filter_by(partner_id=1,agreement_name='1').count() == 1:
+            db_session.add(Agreement(partner_id=1,agreement_name='1'))
+            db_session.commit()
+
+        if not DeliveryOperation.query.filter_by(delivery_operation_name='Income').count() == 1:
+            db_session.add(DeliveryOperation(delivery_operation_name='Income'))
+            db_session.commit()
+
+        if not DeliveryOperation.query.filter_by(delivery_operation_name='Outcome').count() == 1:
+            db_session.add(DeliveryOperation(delivery_operation_name='Outcome'))
+            db_session.commit()
 
     # blueprint for non-auth parts of app
     from .main import main as main_blueprint
@@ -77,6 +91,10 @@ def create_app():
     #blueprint for non-auth parts of app
     from .warehouse import warehouse as warehouse_blueprint
     app.register_blueprint(warehouse_blueprint)
+
+    #blueprint for non-auth parts of app
+    from .partner import partner as partner_blueprint
+    app.register_blueprint(partner_blueprint)
 
 ### Error hanlders 
 
