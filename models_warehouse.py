@@ -25,7 +25,7 @@ class Partner(Base):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f'{self.warehouse_name}>'
+        return f'{self.partner_name}>'
 
 class Agreement(Base):
     __tablename__ = 'agreements'
@@ -36,7 +36,7 @@ class Agreement(Base):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f'{self.warehouse_name}>'
+        return f'{self.agreement_name}>'
 
 class DeliveryOperation(Base):
     __tablename__ = 'delivery_operations'
@@ -46,7 +46,7 @@ class DeliveryOperation(Base):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f'{self.warehouse_name}>'
+        return f'{self.delivery_operation_name}>'
 
 class Item(Base):
     __tablename__ = 'items'
@@ -61,7 +61,7 @@ class Item(Base):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f'{self.warehouse_name}>'
+        return f'{self.item_name}>'
 
 class Delivery(Base):
     __tablename__ = 'deliveries'
@@ -77,4 +77,4 @@ class Delivery(Base):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f'{self.warehouse_name}>'
+        return f'{self.delivery_id}>'
