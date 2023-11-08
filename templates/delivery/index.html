@@ -1,0 +1,23 @@
+{% extends "_base.html" %}
+{% block content %}
+<h1 class="title">
+  Deliveries
+</h1>
+<div>
+  <b>
+    <a href="{{url_for('delivery.create_page') }}">Create</a>
+  </b>
+</div>
+<br>
+
+{% for item in items %}
+  <div>
+      <p>name: {{ item.delivery_id }} <a href="{{url_for('delivery.get',id=item.delivery_id) }}">Details</a>
+      <form action="{{url_for('delivery.delete',id=item['delivery_id'])}}" method="post">
+        <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+        <input class="danger" type="submit" value="Delete" onclick="confirm('Are you sure?');">
+      </form>    
+    </p>
+  </div>
+{% endfor %}
+{% endblock %}

@@ -1,8 +1,8 @@
 from datetime import date
 from .database import Base
-
+from typing import List
 #from flask_security import UserMixin, RoleMixin, AsaList
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, Mapped,mapped_column
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
                     String, ForeignKey
@@ -68,11 +68,13 @@ class Delivery(Base):
     delivery_id = Column(Integer, primary_key=True, autoincrement=True)
     delivery_num = Column(Integer(), unique=True)
     delivery_date = Column(DateTime())    
-    delivery_type = Column(Integer(), unique=True)
+    delivery_type = Column(Integer())
     partner_id = Column('partner_id', Integer(), ForeignKey('partners'))
     delivery_operation_id = Column('delivery_operation_id', Integer(), ForeignKey('delivery_operations'))
     warehouse_id = Column('warehouse_id', Integer(), ForeignKey('warehouses'))
     items = relationship('Item', backref=backref('deliveries'))
+#    items: Mapped[List["Item"]] = relationship(backref="deliveries")
+#    items = items
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 

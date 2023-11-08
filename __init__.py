@@ -1,5 +1,6 @@
 import os
 from os import environ
+from datetime import datetime
 from dotenv import load_dotenv, dotenv_values
 from flask import Flask, render_template, render_template_string
 from flask_security import Security, current_user, auth_required, hash_password, \
@@ -60,10 +61,13 @@ def create_app():
         app.security.datastore.find_or_create_role(
             name="deliveryoperation", permissions={"deliveryoperation-read", "deliveryoperation-write"}
         )
+        app.security.datastore.find_or_create_role(
+            name="delivery", permissions={"delivery-read", "delivery-write"}
+        )
         db_session.commit()
         if not app.security.datastore.find_user(email="test@me.com"):
             app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user","warehouse", "partner","agreement","deliveryoperation"])        
+            password=hash_password("password"), roles=["user","warehouse", "partner","agreement","deliveryoperation","delivery"])        
         db_session.commit()
 
 ############## warehouse #############
@@ -83,6 +87,19 @@ def create_app():
             db_session.add(DeliveryOperation(delivery_operation_name='Outcome'))
             db_session.commit()
 
+        if not Delivery.query.filter_by(delivery_id='1').count() == 1:
+            db_session.add(Delivery(delivery_id='1',delivery_num='1',delivery_type='1',delivery_date=datetime.now(),partner_id='1',warehouse_id='1'))
+            db_session.commit()
+        if not Item.query.filter_by(item_id='1').count() == 1:
+            db_session.add(Item(item_id='1',item_name='eggs',item_count='20',item_units='pcs',item_price='20',item_price_vat='20', delivery_id='1'))
+            db_session.commit()
+
+##### insert into deliveries values ('1','1','8.11.2023 0:0:0','1','1','1','1')
+##### insert into items values('1','eggs','50','pcs','20','20','1')
+#        if not Delivery.query.filter_by(delivery_operation_name='Outcome').count() == 1:
+#            db_session.add(DeliveryOperation(delivery_operation_name='Outcome'))
+#            db_session.commit()
+
     # blueprint for non-auth parts of app
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
@@ -98,6 +115,9 @@ def create_app():
 
     from .agreement import agreement as agreement_blueprint
     app.register_blueprint(agreement_blueprint)
+
+    from .delivery import delivery as delivery_blueprint
+    app.register_blueprint(delivery_blueprint)
 
 ### Error hanlders 
 
