@@ -5,66 +5,71 @@ from markupsafe import escape
 
 from .database import db_session
 from .models_warehouse import Warehouse
-warehouse = Blueprint('warehouse', __name__)
+warehouses = Blueprint('warehouses', __name__)
 
-route_pref='warehouse'
+route_pref='warehouses'
 
-@warehouse.route('/'+route_pref+'/<int:id>')
-@auth_required()
-@roles_accepted(route_pref)
-def get(id):
-    item = Warehouse.query.filter_by(warehouse_id=escape(id)).first().to_dict()
-    return render_template('/'+route_pref+'/item.html', item=item)
+### GET ALL
 
-@warehouse.route('/'+route_pref+'/<int:id>/json')
-@auth_required()
-@roles_accepted(route_pref)
-def get_json(id):
-    item = Warehouse.query.filter_by(warehouse_id=escape(id)).first().to_dict()
-    return jsonify(item)
-
-@warehouse.route('/'+route_pref)
+@warehouses.route('/'+route_pref, methods = ['GET'])
 @auth_required()
 @roles_accepted(route_pref)
 def index():
-#    i = db_session.query(Warehouse).all()
     all = Warehouse.query.all()
     arr = []
-    for item in all:
-        arr.append(item.to_dict())
-    return render_template('/'+route_pref+'/index.html', items=arr)
+    if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
+        for item in all:
+            arr.append(item.to_dict())
+        return jsonify(arr)
+    if 'text/html'in request.headers['Accept']:
+        return render_template('/'+route_pref+'/index.html', items=all)
+    return ''
+### GET ID
 
-@warehouse.route('/'+route_pref+'/create') #, methods=['POST'])
+@warehouses.route('/'+route_pref+'/<int:id>')
 @auth_required()
 @roles_accepted(route_pref)
-def create_page():
-    return render_template('/'+route_pref+'/create.html')
+def get(id):
+    item = Warehouse.query.filter_by(warehouse_id=escape(id)).first()
+    if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
+        return jsonify(item.to_dict())
+    elif 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
+        return jsonify(item.to_dict())
+    elif 'text/html'in request.headers['Accept']:
+        return render_template('/'+route_pref+'/item.html', item=item)
 
-@warehouse.route('/'+route_pref+'/json')
+### CREATE ITEM 
+@warehouses.route('/'+route_pref+'/new')
 @auth_required()
 @roles_accepted(route_pref)
-def index_json():
-    all = Warehouse.query.all()
-    arr = []
-    for item in all:
-        arr.append(item.to_dict())
-    return jsonify(arr)
+def new():
+    return render_template('/'+route_pref+'/new.html')
 
-@warehouse.route('/'+route_pref, methods=['POST'])
+@warehouses.route('/'+route_pref, methods = ['POST','PATCH','UPDATE'])
 @auth_required()
 @roles_accepted(route_pref)
 def create():
-#     # code to validate before database goes here
-    name = request.form.get('name')
-    item = Warehouse(warehouse_name=escape(name))
-
-#     # add the new item to the database
-    db_session.add(item)
+    if 'Content-Type' in request.headers and 'application/x-www-form-urlencoded' in request.headers['Content-Type']:
+        data = request.form.to_dict()
+        print('x-www-form', data)
+    if 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
+        data = request.get_json()
+        print('json', data)
+    newitem = Warehouse(warehouse_name=escape(data['name']))
+    print(newitem)
+    db_session.add(newitem)
     db_session.commit()
-    flash('Data saved')
-    return redirect(url_for('warehouse.index'))
+    item = Warehouse.query.filter_by(warehouse_name=escape(data['name'])).first()
+    if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
+        return jsonify(item.to_dict())
+    elif 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
+        return jsonify(item.to_dict())
+    elif 'text/html'in request.headers['Accept']:
+        return redirect(url_for('warehouses.get',id=item.warehouse_id))
 
-@warehouse.route('/'+route_pref+'/<int:id>/delete', methods=['POST'])
+
+### DELETE ITEM 
+@warehouses.route('/'+route_pref+'/<int:id>/delete', methods=['POST'])
 @auth_required()
 @roles_accepted(route_pref)
 def delete(id):
@@ -72,7 +77,7 @@ def delete(id):
     db_session.delete(item)
     db_session.commit()
     flash('Data deleted')
-    return redirect(url_for('warehouse.index'))
+    return redirect(url_for('warehouses.index'))
 
 #     return redirect(url_for('auth.login'))
 ###########################################

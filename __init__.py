@@ -5,14 +5,12 @@ from dotenv import load_dotenv, dotenv_values
 from flask import Flask, render_template, render_template_string
 from flask_security import Security, current_user, auth_required, hash_password, \
      SQLAlchemySessionUserDatastore, permissions_accepted, roles_accepted
-
 from flask_wtf.csrf import CSRFProtect
-
-csrf = CSRFProtect()
 from .database import db_session, init_db
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
+import uuid
+csrf = CSRFProtect()
 
 load_dotenv('.env')
 
@@ -51,7 +49,7 @@ def create_app():
             name="user", permissions={"user-read", "user-write"}
         )
         app.security.datastore.find_or_create_role(
-            name="warehouse", permissions={"warehouse-read", "warehouse-write"}
+            name="warehouses", permissions={"warehouses-read", "warehouses-write"}
         )
         app.security.datastore.find_or_create_role(
             name="partner", permissions={"partner-read", "partner-write"}
@@ -68,46 +66,67 @@ def create_app():
         db_session.commit()
         if not app.security.datastore.find_user(email="test@me.com"):
             app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user","warehouse", "partner","agreement","deliveryoperation","delivery"])        
+            password=hash_password("password"), roles=["user","warehouses", "partner","agreement","deliveryoperation","delivery"])        
         db_session.commit()
 
 ############## warehouse #############
-        if not Warehouse.query.filter_by(warehouse_name='1').count() == 1:
-            db_session.add(Warehouse(warehouse_name='1'))
-            db_session.commit()
-        if not Partner.query.filter_by(partner_name='1').count() == 1:
-            db_session.add(Partner(partner_name='1'))
-            db_session.commit()
-        if not Agreement.query.filter_by(partner_id=1,agreement_name='1').count() == 1:
-            db_session.add(Agreement(partner_id=1,agreement_name='1'))
-            db_session.commit()
-        if not DeliveryOperation.query.filter_by(delivery_operation_name='Income').count() == 1:
-            db_session.add(DeliveryOperation(delivery_operation_name='Income'))
-            db_session.commit()
-        if not DeliveryOperation.query.filter_by(delivery_operation_name='Outcome').count() == 1:
-            db_session.add(DeliveryOperation(delivery_operation_name='Outcome'))
+        if not Warehouse.query.filter_by(name='1').count() == 1:
+            db_session.add(Warehouse(name='1'))
             db_session.commit()
 
-        if not Delivery.query.filter_by(delivery_id='1').count() == 1:
-            db_session.add(Delivery(delivery_id='1',delivery_num='1',delivery_type='1',delivery_date=datetime.now(),partner_id='1',warehouse_id='1'))
+        partner = Partner(name='1')
+        if not Partner.query.filter_by(name='1').count() == 1:
+            db_session.add(partner)
             db_session.commit()
-        if not Item.query.filter_by(item_id='1').count() == 1:
-            db_session.add(Item(item_id='1',item_name='eggs',item_count='20',item_units='pcs',item_price='20',item_price_vat='20', delivery_id='1'))
+        agr = Agreement(partner_id=Partner.query.filter_by(name='1').first().id,name='1')
+        if not Agreement.query.filter_by(name='1').count() == 1:
+            db_session.add(agr)
             db_session.commit()
 
-##### insert into deliveries values ('1','1','8.11.2023 0:0:0','1','1','1','1')
-##### insert into items values('1','eggs','50','pcs','20','20','1')
-#        if not Delivery.query.filter_by(delivery_operation_name='Outcome').count() == 1:
-#            db_session.add(DeliveryOperation(delivery_operation_name='Outcome'))
-#            db_session.commit()
+        if not DeliveryOperation.query.filter_by(name='Income').count() == 1:
+             db_session.add(DeliveryOperation(name='Income'))
+             db_session.commit()
+        if not DeliveryOperation.query.filter_by(name='Outcome').count() == 1:
+            db_session.add(DeliveryOperation(name='Outcome'))
+            db_session.commit()
+
+        deliveryIn = Delivery(num='1',date=datetime.now(), \
+            partner_id=Partner.query.filter_by(name='1').first().id, \
+            warehouse_id=Warehouse.query.filter_by(name='1').first().id,
+            delivery_operation_id=DeliveryOperation.query.filter_by(name='Income').first().id
+            )
+        if not Delivery.query.filter_by(num='1').count() == 1:
+            db_session.add(deliveryIn)                           
+            db_session.commit()
+
+        deliveryOut = Delivery(id=uuid.uuid4(),num='2',date=datetime.now(), \
+            partner_id=Partner.query.filter_by(name='1').first().id, \
+            warehouse_id=Warehouse.query.filter_by(name='1').first().id,
+            delivery_operation_id=DeliveryOperation.query.filter_by(name='Outcome').first().id
+            )
+        if not Delivery.query.filter_by(num='2').count() == 1:
+            db_session.add(deliveryOut)                           
+            db_session.commit()
+
+        itemIn = Item(name='eggs',count='20',units='pcs',price='20', \
+            price_vat='20', delivery_id=Delivery.query.filter_by(num='1').first().id)
+        if not Item.query.filter_by(name='eggs',count='20').count() == 1:
+            db_session.add(itemIn)
+            db_session.commit()
+        
+        itemOut = Item(id=uuid.uuid4(),name='eggs',count='10',units='pcs',price='20', \
+            price_vat='10', delivery_id=Delivery.query.filter_by(num='2').first().id)
+        if not Item.query.filter_by(name='eggs',count='q0').count() == 1:
+            db_session.add(itemOut)
+            db_session.commit()
 
     # blueprint for non-auth parts of app
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
     #blueprint for non-auth parts of app
-    from .warehouse import warehouse as warehouse_blueprint
-    app.register_blueprint(warehouse_blueprint)
+    from .warehouses import warehouses as warehouses_blueprint
+    app.register_blueprint(warehouses_blueprint)
 
     #blueprint for non-auth parts of app
     from .partner import partner as partner_blueprint

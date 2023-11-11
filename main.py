@@ -11,7 +11,7 @@ def index():
 
 @main.route('/profile')
 @auth_required()
-@roles_accepted("user")
+#@roles_accepted("user")
 #@permissions_accepted("user-read")
 #permissions_accepted('Super Administrator')
 def profile():
@@ -19,7 +19,7 @@ def profile():
 
 @main.route('/profile/json')
 @auth_required()
-@roles_accepted("user")
+#@roles_accepted("user")
 #@permissions_accepted("user-read")
 #permissions_accepted('Super Administrator')
 def profile_json():
@@ -28,7 +28,7 @@ def profile_json():
 
 @main.route('/roles/json')
 @auth_required()
-@roles_accepted("user")
+#@roles_accepted("user")
 #@permissions_accepted("user-read")
 #permissions_accepted('Super Administrator')
 def roles_json():
