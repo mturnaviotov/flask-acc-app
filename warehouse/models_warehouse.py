@@ -37,15 +37,6 @@ class Agreement(Base):
     def __repr__(self):
         return f"{self.name}:{self.id}"
 
-class DeliveryOperation(Base):
-    __tablename__ = 'delivery_operations'
-    id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
-    name = Column(String(80), primary_key=True, unique=True)
-    def to_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-    def __repr__(self):
-        return f"{self.name}:{self.id}"
-
 class Item(Base):
     __tablename__ = 'items'
     id = Column(Uuid, default=uuid.uuid4(), primary_key=True)
@@ -67,9 +58,9 @@ class Delivery(Base):
     __tablename__ = 'deliveries'
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
     num = Column(Integer())
-    date = Column(DateTime()) 
+    date = Column(DateTime())
+    type = Column(Boolean)
     partner_id = Column('partner_id', Uuid(), ForeignKey('partners.id'))
-    delivery_operation_id = Column('delivery_operation_id', Uuid(), ForeignKey('delivery_operations.id'))
     warehouse_id = Column('warehouse_id', Uuid(), ForeignKey('warehouses.id'))
     items = relationship('Item', backref=backref('deliveries.id'))
     #items: Mapped[List["Item"]] = relationship()

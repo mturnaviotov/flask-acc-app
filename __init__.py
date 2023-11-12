@@ -39,7 +39,7 @@ def create_app():
     user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
     app.security = Security(app, user_datastore)
 
-    from .warehouse.models_warehouse import Warehouse, Partner, Agreement, Item, DeliveryOperation, Delivery
+    from .warehouse.models_warehouse import Warehouse, Partner, Agreement, Item, Delivery
 
     # one time setup
     with app.app_context():
@@ -58,15 +58,12 @@ def create_app():
             name="agreements", permissions={"agreements-read", "agreements-write"}
         )
         app.security.datastore.find_or_create_role(
-            name="deliveryoperations", permissions={"deliveryoperations-read", "deliveryoperations-write"}
-        )
-        app.security.datastore.find_or_create_role(
             name="deliveries", permissions={"deliveries-read", "deliveries-write"}
         )
         db_session.commit()
         if not app.security.datastore.find_user(email="test@me.com"):
             app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user","warehouses", "partners","agreements","deliveryoperations","deliveries"])        
+            password=hash_password("password"), roles=["user","warehouses", "partners","agreements","deliveries"])
         db_session.commit()
 
 ############## warehouse #############
@@ -83,26 +80,17 @@ def create_app():
             db_session.add(agr)
             db_session.commit()
 
-        if not DeliveryOperation.query.filter_by(name='Income').count() == 1:
-             db_session.add(DeliveryOperation(name='Income'))
-             db_session.commit()
-        if not DeliveryOperation.query.filter_by(name='Outcome').count() == 1:
-            db_session.add(DeliveryOperation(name='Outcome'))
-            db_session.commit()
-
-        deliveryIn = Delivery(num='1',date=datetime.now(), \
+        deliveryIn = Delivery(num='1',date=datetime.now(), type=True, \
             partner_id=Partner.query.filter_by(name='1').first().id, \
             warehouse_id=Warehouse.query.filter_by(name='1').first().id,
-            delivery_operation_id=DeliveryOperation.query.filter_by(name='Income').first().id
             )
         if not Delivery.query.filter_by(num='1').count() == 1:
             db_session.add(deliveryIn)                           
             db_session.commit()
 
-        deliveryOut = Delivery(id=uuid.uuid4(),num='2',date=datetime.now(), \
+        deliveryOut = Delivery(id=uuid.uuid4(),num='2',date=datetime.now(), type=False, \
             partner_id=Partner.query.filter_by(name='1').first().id, \
-            warehouse_id=Warehouse.query.filter_by(name='1').first().id,
-            delivery_operation_id=DeliveryOperation.query.filter_by(name='Outcome').first().id
+            warehouse_id=Warehouse.query.filter_by(name='1').first().id
             )
         if not Delivery.query.filter_by(num='2').count() == 1:
             db_session.add(deliveryOut)                           
