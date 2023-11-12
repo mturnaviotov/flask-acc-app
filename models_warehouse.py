@@ -14,9 +14,11 @@ class Warehouse(Base):
     deliveries = relationship('Delivery', backref='warehouses')
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
     def __repr__(self):
-        return f'{self.name}>'
+        return f"{self.name}:{self.id}"
+    def test(self):
+        return [self.__table__.columns]
+        
 
 class Partner(Base):
     __tablename__ = 'partners'
@@ -25,7 +27,7 @@ class Partner(Base):
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
-        return f'{self.name}>'
+        return f"{self.name}:{self.id}"
 
 class Agreement(Base):
     __tablename__ = 'agreements'
@@ -35,7 +37,7 @@ class Agreement(Base):
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
-        return f'{self.name}>'
+        return f"{self.name}:{self.id}"
 
 class DeliveryOperation(Base):
     __tablename__ = 'delivery_operations'
@@ -44,7 +46,7 @@ class DeliveryOperation(Base):
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
-        return f'{self.name}>'
+        return f"{self.name}:{self.id}"
 
 class Item(Base):
     __tablename__ = 'items'
@@ -61,7 +63,7 @@ class Item(Base):
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
-        return f'{self.name}>'
+        return f"{self.name}:{self.id}"
 
 class Delivery(Base):
     __tablename__ = 'deliveries'
@@ -74,9 +76,9 @@ class Delivery(Base):
     items = relationship('Item', backref=backref('deliveries.id'))
     #items: Mapped[List["Item"]] = relationship()
     items: Mapped[List["Item"]] = relationship(backref="Delivery")
-#    items = items
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
     def __repr__(self):
-        return f'{self.id}>'
+        return f"{self.num}:{self.id}"
+        
+
