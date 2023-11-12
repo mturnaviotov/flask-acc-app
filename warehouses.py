@@ -47,7 +47,7 @@ def get(id):
 def new():
     return render_template('/'+route_pref+'/new.html')
 
-@warehouses.route('/'+route_pref+'/', methods = ['POST','PATCH','UPDATE'])
+@warehouses.route('/'+route_pref+'/', methods = ['POST'])
 @auth_required()
 @roles_accepted(route_pref)
 def create():
@@ -67,6 +67,37 @@ def create():
         flash('Item created')
         return redirect(url_for('warehouses.get',id=item.id))
 
+### UPDATE ITEM 
+@warehouses.route('/'+route_pref+'/<uuid:id>', methods=['UPDATE','PATCH','POST'])
+@auth_required()
+@roles_accepted(route_pref)
+def update(id):
+    safe = escape(id)
+    id = uuid.UUID(safe)
+    item = Warehouse.query.filter_by(id=id).first()#.to_dict()
+    dict = item.to_dict()
+    db_session.delete(item)
+    #s = dict(item.__table__.columns)
+    #props= (list(s))
+    if 'Content-Type' in request.headers and 'application/x-www-form-urlencoded' in request.headers['Content-Type']:
+        data = request.form.to_dict()
+    if 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
+        data = request.get_json()
+#    for prop in props:
+#        if prop != 'id': item['{prop}'] = data[prop] 
+    for field in data:
+        dict[field] = escape(data[field])
+    newItem = Warehouse(**dict)
+    db_session.add(newItem)
+    db_session.commit()
+    if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
+        return jsonify(newItem.to_dict())
+    elif 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
+        return jsonify(newItem.to_dict())
+    elif 'text/html'in request.headers['Accept']:
+        flash('Item Updated')
+        return redirect(url_for('warehouses.get',id=newItem.id))
+
 ### DELETE ITEM 
 @warehouses.route('/'+route_pref+'/<uuid:id>/delete', methods=['POST','DELETE'])
 @auth_required()
@@ -84,4 +115,3 @@ def delete(id):
     elif 'text/html'in request.headers['Accept']:
         flash('Item Deleted')
         return redirect(url_for('warehouses.index'))
-    return '' #redirect(url_for('warehouses.index'))
