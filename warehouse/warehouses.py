@@ -56,7 +56,6 @@ def edit(id):
     safe = escape(id)
     id = uuid.UUID(safe)
     item = Warehouse.query.filter_by(id=id).first()
-
     return render_template('/'+route_pref+'/edit.html', item=item)
 
 @block.route('/'+route_pref+'/', methods = ['POST'])

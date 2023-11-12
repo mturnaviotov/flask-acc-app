@@ -3,6 +3,8 @@ from flask_security import current_user, auth_required, permissions_accepted, ro
 
 main = Blueprint('main', __name__)
 
+from .warehouse.models_warehouse import Warehouse
+
 # Views
 
 @main.route('/')
@@ -43,3 +45,10 @@ def roles_json():
 def board():
     return '' #jsonify(current_user.to_dict())
     #return render_template('profile.html', user='')
+
+@main.route('/test')
+@auth_required()
+def test():
+    i = Warehouse.query.first()
+    print(list(i.deliveries))
+    return ''
