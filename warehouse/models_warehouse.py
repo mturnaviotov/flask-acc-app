@@ -57,7 +57,7 @@ class Delivery(Base):
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
     num = Column(Integer())
     date = Column(DateTime())
-    type = Column(Boolean())
+    income = Column(Boolean())
     partner_id = Column('partner_id', Uuid(), ForeignKey('partners.id'))
     partner = relationship('Partner', backref='deliveries')
     warehouse_id: Mapped[Uuid] = mapped_column(ForeignKey("warehouses.id"))

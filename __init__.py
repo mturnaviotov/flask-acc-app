@@ -80,7 +80,7 @@ def create_app():
             db_session.add(agr)
             db_session.commit()
 
-        deliveryIn = Delivery(num='1',date=datetime.now(), type=True, \
+        deliveryIn = Delivery(num='1',date=datetime.now(), income=True, \
             partner_id=Partner.query.filter_by(name='1').first().id, \
             warehouse_id=Warehouse.query.filter_by(name='1').first().id,
             )
@@ -88,7 +88,7 @@ def create_app():
             db_session.add(deliveryIn)                           
             db_session.commit()
 
-        deliveryOut = Delivery(id=uuid.uuid4(),num='2',date=datetime.now(), type=False, \
+        deliveryOut = Delivery(id=uuid.uuid4(),num='2',date=datetime.now(), income=False, \
             partner_id=Partner.query.filter_by(name='1').first().id, \
             warehouse_id=Warehouse.query.filter_by(name='1').first().id
             )
