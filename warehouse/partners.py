@@ -45,7 +45,17 @@ def get(id):
 @auth_required()
 @roles_accepted(route_pref)
 def new():
-    return render_template('/'+route_pref+'/new.html')
+    return render_template('/'+route_pref+'/edit.html')
+
+### EDIT ITEM
+@block.route('/'+route_pref+'/<uuid:id>/edit')
+@auth_required()
+@roles_accepted(route_pref)
+def edit(id):
+    safe = escape(id)
+    id = uuid.UUID(safe)
+    item = Partner.query.filter_by(id=id).first()
+    return render_template('/'+route_pref+'/edit.html', item=item)
 
 @block.route('/'+route_pref+'/', methods = ['POST'])
 @auth_required()
