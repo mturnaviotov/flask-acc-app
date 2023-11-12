@@ -4,7 +4,7 @@ from flask_security import auth_required, permissions_accepted, roles_accepted
 from markupsafe import escape
 
 from .database import db_session
-from .models_warehouse import Agreement, Partner
+from .warehouse.models_warehouse import Agreement, Partner
 agreement = Blueprint('agreement', __name__)
 
 route_pref='agreement'

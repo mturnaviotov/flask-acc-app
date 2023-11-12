@@ -39,7 +39,7 @@ def create_app():
     user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
     app.security = Security(app, user_datastore)
 
-    from .models_warehouse import Warehouse, Partner, Agreement, Item, DeliveryOperation, Delivery
+    from .warehouse.models_warehouse import Warehouse, Partner, Agreement, Item, DeliveryOperation, Delivery
 
     # one time setup
     with app.app_context():
@@ -52,21 +52,21 @@ def create_app():
             name="warehouses", permissions={"warehouses-read", "warehouses-write"}
         )
         app.security.datastore.find_or_create_role(
-            name="partner", permissions={"partner-read", "partner-write"}
+            name="partners", permissions={"partners-read", "partners-write"}
         )
         app.security.datastore.find_or_create_role(
-            name="agreement", permissions={"agreement-read", "agreement-write"}
+            name="agreements", permissions={"agreements-read", "agreements-write"}
         )
         app.security.datastore.find_or_create_role(
-            name="deliveryoperation", permissions={"deliveryoperation-read", "deliveryoperation-write"}
+            name="deliveryoperations", permissions={"deliveryoperations-read", "deliveryoperations-write"}
         )
         app.security.datastore.find_or_create_role(
-            name="delivery", permissions={"delivery-read", "delivery-write"}
+            name="deliveries", permissions={"deliveries-read", "deliveries-write"}
         )
         db_session.commit()
         if not app.security.datastore.find_user(email="test@me.com"):
             app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user","warehouses", "partner","agreement","deliveryoperation","delivery"])        
+            password=hash_password("password"), roles=["user","warehouses", "partners","agreements","deliveryoperations","deliveries"])        
         db_session.commit()
 
 ############## warehouse #############
@@ -125,12 +125,12 @@ def create_app():
     app.register_blueprint(main_blueprint)
 
     #blueprint for non-auth parts of app
-    from .warehouses import warehouses as warehouses_blueprint
+    from .warehouse.warehouses import warehouses as warehouses_blueprint
     app.register_blueprint(warehouses_blueprint)
 
     #blueprint for non-auth parts of app
-    from .partner import partner as partner_blueprint
-    app.register_blueprint(partner_blueprint)
+    from .warehouse.partners import block as partners_blueprint
+    app.register_blueprint(partners_blueprint)
     #blueprint for non-auth parts of app
 
     from .agreement import agreement as agreement_blueprint

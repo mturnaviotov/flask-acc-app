@@ -3,7 +3,7 @@ from flask import Blueprint, url_for, request, jsonify, render_template, redirec
 from flask_security import auth_required, permissions_accepted, roles_accepted
 from markupsafe import escape
 from .database import db_session
-from .models_warehouse import Delivery, Partner, DeliveryOperation, Item, Warehouse
+from .warehouse.models_warehouse import Delivery, Partner, DeliveryOperation, Item, Warehouse
 delivery = Blueprint('delivery', __name__)
 
 route_pref='delivery'

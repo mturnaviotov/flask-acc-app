@@ -1,9 +1,7 @@
 from datetime import date
-from .database import Base
+from ..database import Base
 from typing import List
-#from flask_security import UserMixin, RoleMixin, AsaList
 from sqlalchemy.orm import relationship, backref, Mapped, mapped_column
-#from sqlalchemy.ext.mutable import MutableList
 import uuid
 from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey, Uuid
 
@@ -16,8 +14,8 @@ class Warehouse(Base):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
         return f"{self.name}:{self.id}"
-    def test(self):
-        return [self.__table__.columns]
+#    def test(self):
+#        return [self.__table__.columns]
         
 
 class Partner(Base):
@@ -80,5 +78,3 @@ class Delivery(Base):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
         return f"{self.num}:{self.id}"
-        
-

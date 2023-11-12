@@ -3,7 +3,7 @@ from flask import Blueprint, url_for, request, jsonify, render_template, redirec
 from flask_security import auth_required, permissions_accepted, roles_accepted
 from markupsafe import escape
 import uuid
-from .database import db_session
+from ..database import db_session
 from .models_warehouse import Warehouse
 warehouses = Blueprint('warehouses', __name__)
 
