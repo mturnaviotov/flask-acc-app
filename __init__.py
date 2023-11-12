@@ -39,7 +39,7 @@ def create_app():
     user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
     app.security = Security(app, user_datastore)
 
-    from .warehouse.models_warehouse import Warehouse, Partner, Agreement, Item, Delivery
+    from .warehouse.models_warehouse import Warehouse, Partner, Agreement, Good, Delivery
 
     # one time setup
     with app.app_context():
@@ -60,10 +60,13 @@ def create_app():
         app.security.datastore.find_or_create_role(
             name="deliveries", permissions={"deliveries-read", "deliveries-write"}
         )
+        app.security.datastore.find_or_create_role(
+            name="goods", permissions={"goods-read", "goods-write"}
+        )
         db_session.commit()
         if not app.security.datastore.find_user(email="test@me.com"):
             app.security.datastore.create_user(email="test@me.com",
-            password=hash_password("password"), roles=["user","warehouses", "partners","agreements","deliveries"])
+            password=hash_password("password"), roles=["user","warehouses", "partners","agreements","deliveries","goods"])
         db_session.commit()
 
 ############## warehouse #############
@@ -96,15 +99,15 @@ def create_app():
             db_session.add(deliveryOut)                           
             db_session.commit()
 
-        itemIn = Item(name='eggs',count='20',units='pcs',price='20', \
+        itemIn = Good(name='eggs',count='20',units='pcs',price='20', \
             price_vat='20', delivery_id=Delivery.query.filter_by(num='1').first().id)
-        if not Item.query.filter_by(name='eggs',count='20').count() == 1:
+        if not Good.query.filter_by(name='eggs',count='20').count() == 1:
             db_session.add(itemIn)
             db_session.commit()
         
-        itemOut = Item(id=uuid.uuid4(),name='eggs',count='10',units='pcs',price='20', \
+        itemOut = Good(id=uuid.uuid4(),name='eggs',count='10',units='pcs',price='20', \
             price_vat='10', delivery_id=Delivery.query.filter_by(num='2').first().id)
-        if not Item.query.filter_by(name='eggs',count='q0').count() == 1:
+        if not Good.query.filter_by(name='eggs',count='10').count() == 1:
             db_session.add(itemOut)
             db_session.commit()
 
@@ -126,6 +129,9 @@ def create_app():
 
     from .warehouse.deliveries import block as deliveries_blueprint
     app.register_blueprint(deliveries_blueprint)
+
+    from .warehouse.goods import block as goods_blueprint
+    app.register_blueprint(goods_blueprint)
 
 ### Error hanlders 
 

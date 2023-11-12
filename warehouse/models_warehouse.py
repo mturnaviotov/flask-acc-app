@@ -38,7 +38,7 @@ class Agreement(Base):
     def __repr__(self):
         return f"{self.name}:{self.id}"
 
-class Item(Base):
+class Good(Base):
     __tablename__ = 'items'
     id = Column(Uuid, default=uuid.uuid4(), primary_key=True)
     name = Column(String(80))
@@ -62,7 +62,7 @@ class Delivery(Base):
     partner = relationship('Partner', backref='deliveries')
     warehouse_id: Mapped[Uuid] = mapped_column(ForeignKey("warehouses.id"))
     warehouse: Mapped["Warehouse"] = relationship(back_populates="deliveries")
-    items: Mapped[List["Item"]] = relationship(backref="Delivery")
+    goods: Mapped[List["Good"]] = relationship(backref="Delivery")
     def to_dict(self):  
        src = {c.name: getattr(self, c.name) for c in self.__table__.columns}
        src['partner_name'] = self.partner.name #.to_dict()
