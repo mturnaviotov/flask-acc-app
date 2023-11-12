@@ -29,11 +29,8 @@
                             <a href="{{ url_for('partners.index') }}" class="navbar-item">
                                 <b>Partners</b>
                             </a>
-                            <a href="{{ url_for('agreement.index') }}" class="navbar-item">
+                            <a href="{{ url_for('agreements.index') }}" class="navbar-item">
                                 <b>Agreements</b>
-                            </a>
-                            <a href="{{ url_for('delivery.index') }}" class="navbar-item">
-                                <b>Deliveries</b>
                             </a>
                             {% endif %}
                             {% if not current_user.is_authenticated %}

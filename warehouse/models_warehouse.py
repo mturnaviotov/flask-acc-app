@@ -13,10 +13,7 @@ class Warehouse(Base):
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
-        return f"{self.name}:{self.id}"
-#    def test(self):
-#        return [self.__table__.columns]
-        
+        return f"{self.name}:{self.id}"        
 
 class Partner(Base):
     __tablename__ = 'partners'
@@ -31,9 +28,12 @@ class Agreement(Base):
     __tablename__ = 'agreements'
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
     partner_id = Column('partner_id', Uuid, ForeignKey('partners.id'), nullable=False)
+    partner = relationship('Partner', backref='agreements')
     name = Column(String(80), primary_key=True, unique=True)
     def to_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+       src = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+       src['partner_name'] = self.partner.name #.to_dict()
+       return src
     def __repr__(self):
         return f"{self.name}:{self.id}"
 
@@ -45,10 +45,7 @@ class Item(Base):
     units = Column(String(80))
     price = Column(Integer()) # incl VAT
     price_vat = Column(Integer(), default=20)
-    delivery_id = Column('delivery_id', Uuid(), ForeignKey('deliveries.id'), nullable=False)
-    #delivery = mapped_column(ForeignKey("deliveries.id"))
-    #delivery: Mapped["Delivery"] = relationship(back_populates="items")
-    delivery_id: Mapped[int] = mapped_column(ForeignKey("deliveries.id"))
+    delivery_id: Mapped[Uuid] = mapped_column(ForeignKey("deliveries.id"))
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
@@ -62,7 +59,8 @@ class Delivery(Base):
     type = Column(Boolean)
     partner_id = Column('partner_id', Uuid(), ForeignKey('partners.id'))
     warehouse_id = Column('warehouse_id', Uuid(), ForeignKey('warehouses.id'))
-    items = relationship('Item', backref=backref('deliveries.id'))
+    #items = relationship('Item', backref=backref('deliveries.id'))
+    #items: Mapped[List["Item"]] = relationship(back_populates="delivery")
     #items: Mapped[List["Item"]] = relationship()
     items: Mapped[List["Item"]] = relationship(backref="Delivery")
     def to_dict(self):

@@ -4,11 +4,11 @@ from flask_security import auth_required, permissions_accepted, roles_accepted
 from markupsafe import escape
 import uuid
 from ..database import db_session
-from .models_warehouse import Warehouse
+from .models_warehouse import Agreement, Partner
 
-block = Blueprint('warehouses', __name__)
+block = Blueprint('agreements', __name__)
 
-route_pref='warehouses'
+route_pref='agreements'
 
 ### GET ALL
 
@@ -16,7 +16,7 @@ route_pref='warehouses'
 @auth_required()
 @roles_accepted(route_pref)
 def index():
-    all = Warehouse.query.all()
+    all = Agreement.query.all()
     arr = []
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
         for item in all:
@@ -33,7 +33,8 @@ def index():
 def get(id):
     safe = escape(id)
     id = uuid.UUID(safe)
-    item = Warehouse.query.filter_by(id=id).first()
+    item = Agreement.query.filter_by(id=id).first()
+    item.partner = item.partner
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
         return jsonify(item.to_dict())
     elif 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
@@ -55,7 +56,7 @@ def new():
 def edit(id):
     safe = escape(id)
     id = uuid.UUID(safe)
-    item = Warehouse.query.filter_by(id=id).first()
+    item = Agreement.query.filter_by(id=id).first()
     return render_template('/'+route_pref+'/edit.html', item=item)
 
 @block.route('/'+route_pref+'/', methods = ['POST'])
@@ -66,10 +67,10 @@ def create():
         data = request.form.to_dict()
     if 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
         data = request.get_json()
-    newitem = Warehouse(name=escape(data['name']))
+    newitem = Agreement(name=escape(data['name']))
     db_session.add(newitem)
     db_session.commit()
-    item = Warehouse.query.filter_by(name=escape(data['name'])).first()
+    item = Agreement.query.filter_by(name=escape(data['name'])).first()
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
         return jsonify(item.to_dict())
     elif 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
@@ -85,7 +86,7 @@ def create():
 def update(id):
     safe = escape(id)
     id = uuid.UUID(safe)
-    item = Warehouse.query.filter_by(id=id).first()#.to_dict()
+    item = Agreement.query.filter_by(id=id).first()#.to_dict()
     dict = item.to_dict()
     db_session.delete(item)
     #s = dict(item.__table__.columns)
@@ -98,7 +99,7 @@ def update(id):
 #        if prop != 'id': item['{prop}'] = data[prop] 
     for field in data:
         dict[field] = escape(data[field])
-    newItem = Warehouse(**dict)
+    newItem = Agreement(**dict)
     db_session.add(newItem)
     db_session.commit()
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
@@ -116,7 +117,7 @@ def update(id):
 def delete(id):
     safe = escape(id)
     id = uuid.UUID(safe)
-    item =Warehouse.query.filter_by(id=id).first()
+    item =Agreement.query.filter_by(id=id).first()
     db_session.delete(item)
     db_session.commit()
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:

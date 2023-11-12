@@ -121,11 +121,11 @@ def create_app():
     app.register_blueprint(partners_blueprint)
     #blueprint for non-auth parts of app
 
-    from .agreement import agreement as agreement_blueprint
-    app.register_blueprint(agreement_blueprint)
+    from .warehouse.agreements import block as agreements_blueprint
+    app.register_blueprint(agreements_blueprint)
 
-    from .delivery import delivery as delivery_blueprint
-    app.register_blueprint(delivery_blueprint)
+    from .delivery import delivery as deliveries_blueprint
+    app.register_blueprint(deliveries_blueprint)
 
 ### Error hanlders 
 
