@@ -34,3 +34,12 @@ def profile_json():
 def roles_json():
     roles = list(map(lambda x: x.to_dict(), current_user.roles))
     return jsonify(roles)
+
+@main.route('/board')
+@auth_required()
+#@roles_accepted("user")
+#@permissions_accepted("user-read")
+#permissions_accepted('Super Administrator')
+def board():
+    return '' #jsonify(current_user.to_dict())
+    #return render_template('profile.html', user='')
