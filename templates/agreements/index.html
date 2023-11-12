@@ -5,14 +5,14 @@
 </h1>
 <div>
   <b>
-    <a href="{{url_for('partners.new') }}">Create</a>
+    <a href="{{url_for('agreements.new') }}">Create</a>
   </b>
 </div>
 <br>
-
 {% for item in items %}
   <div>
-      <p>name: {{ item.name }} <a href="{{url_for('agreements.get',id=item.id) }}">Details | <a href="{{url_for('agreements.edit',id=item.id) }}">Edit</a>      <form action="{{url_for('partners.delete',id=item['id'])}}" method="post">
+      <p>name: {{ item.name }} <a href="{{url_for('agreements.get',id=item.id) }}">Details | <a href="{{url_for('agreements.edit',id=item.id) }}">Edit</a>
+      <form action="{{url_for('agreements.delete',id=item['id'])}}" method="post">
         <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input class="danger" type="submit" value="Delete" onclick="confirm('Are you sure?');">
       </form>    

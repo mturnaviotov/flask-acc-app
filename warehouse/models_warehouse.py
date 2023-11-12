@@ -9,7 +9,8 @@ class Warehouse(Base):
     __tablename__ = 'warehouses'
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
     name = Column(String(80), primary_key=True, unique=True)
-    deliveries = relationship('Delivery', backref='warehouses')
+    #deliveries = relationship('Delivery', backref='warehouses')
+    deliveries: Mapped[List["Delivery"]] = relationship()
     def to_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def __repr__(self):
@@ -56,14 +57,16 @@ class Delivery(Base):
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
     num = Column(Integer())
     date = Column(DateTime())
-    type = Column(Boolean)
+    type = Column(Boolean())
     partner_id = Column('partner_id', Uuid(), ForeignKey('partners.id'))
-    warehouse_id = Column('warehouse_id', Uuid(), ForeignKey('warehouses.id'))
-    #items = relationship('Item', backref=backref('deliveries.id'))
-    #items: Mapped[List["Item"]] = relationship(back_populates="delivery")
-    #items: Mapped[List["Item"]] = relationship()
+    partner = relationship('Partner', backref='deliveries')
+    warehouse_id: Mapped[Uuid] = mapped_column(ForeignKey("warehouses.id"))
+    warehouse: Mapped["Warehouse"] = relationship(back_populates="deliveries")
     items: Mapped[List["Item"]] = relationship(backref="Delivery")
-    def to_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    def to_dict(self):  
+       src = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+       src['partner_name'] = self.partner.name #.to_dict()
+       src['warehouse_name'] = self.warehouse.name #.to_dict()
+       return src
     def __repr__(self):
         return f"{self.num}:{self.id}"

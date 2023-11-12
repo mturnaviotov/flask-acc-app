@@ -124,7 +124,7 @@ def create_app():
     from .warehouse.agreements import block as agreements_blueprint
     app.register_blueprint(agreements_blueprint)
 
-    from .delivery import delivery as deliveries_blueprint
+    from .warehouse.deliveries import block as deliveries_blueprint
     app.register_blueprint(deliveries_blueprint)
 
 ### Error hanlders 
