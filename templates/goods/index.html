@@ -12,6 +12,10 @@
 {% for item in items %}
   <div>
       <p>name: {{ item.name }} <a href="{{url_for('goods.get',id=item.id) }}">Details | <a href="{{url_for('goods.edit',id=item.id) }}">Edit</a>
+        count: {{ item.count }} |
+        units: {{ item.units }} |
+        price: {{ item.price }} |
+        price_vat: {{ item.price_vat }}
       <form action="{{url_for('goods.delete',id=item['id'])}}" method="post">
         <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input class="danger" type="submit" value="Delete" onclick="confirm('Are you sure?');">

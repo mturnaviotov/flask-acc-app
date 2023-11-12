@@ -35,6 +35,9 @@
                             <a href="{{ url_for('deliveries.index') }}" class="navbar-item">
                                 <b>Deliveries</b>
                             </a>
+                            <a href="{{ url_for('goods.index') }}" class="navbar-item">
+                                <b>Goods</b>
+                            </a>
                             {% endif %}
                             {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('security.login') }}" class="navbar-item">
