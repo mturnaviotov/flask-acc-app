@@ -125,7 +125,7 @@ def create_app():
     app.register_blueprint(main_blueprint)
 
     #blueprint for non-auth parts of app
-    from .warehouse.warehouses import warehouses as warehouses_blueprint
+    from .warehouse.warehouses import block as warehouses_blueprint
     app.register_blueprint(warehouses_blueprint)
 
     #blueprint for non-auth parts of app

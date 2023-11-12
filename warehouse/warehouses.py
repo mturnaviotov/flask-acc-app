@@ -5,13 +5,14 @@ from markupsafe import escape
 import uuid
 from ..database import db_session
 from .models_warehouse import Warehouse
-warehouses = Blueprint('warehouses', __name__)
+
+block = Blueprint('warehouses', __name__)
 
 route_pref='warehouses'
 
 ### GET ALL
 
-@warehouses.route('/'+route_pref+'/', methods = ['GET'])
+@block.route('/'+route_pref+'/', methods = ['GET'])
 @auth_required()
 @roles_accepted(route_pref)
 def index():
@@ -26,7 +27,7 @@ def index():
     return ''
 ### GET ID
 
-@warehouses.route('/'+route_pref+'/<uuid:id>')
+@block.route('/'+route_pref+'/<uuid:id>')
 @auth_required()
 @roles_accepted(route_pref)
 def get(id):
@@ -41,13 +42,24 @@ def get(id):
         return render_template('/'+route_pref+'/item.html', item=item)
 
 ### CREATE ITEM 
-@warehouses.route('/'+route_pref+'/new')
+@block.route('/'+route_pref+'/new')
 @auth_required()
 @roles_accepted(route_pref)
 def new():
-    return render_template('/'+route_pref+'/new.html')
+    return render_template('/'+route_pref+'/edit.html')
 
-@warehouses.route('/'+route_pref+'/', methods = ['POST'])
+### EDIT ITEM
+@block.route('/'+route_pref+'/<uuid:id>/edit')
+@auth_required()
+@roles_accepted(route_pref)
+def edit(id):
+    safe = escape(id)
+    id = uuid.UUID(safe)
+    item = Warehouse.query.filter_by(id=id).first()
+
+    return render_template('/'+route_pref+'/edit.html', item=item)
+
+@block.route('/'+route_pref+'/', methods = ['POST'])
 @auth_required()
 @roles_accepted(route_pref)
 def create():
@@ -67,8 +79,8 @@ def create():
         flash('Item created')
         return redirect(url_for('warehouses.get',id=item.id))
 
-### UPDATE ITEM 
-@warehouses.route('/'+route_pref+'/<uuid:id>', methods=['UPDATE','PATCH','POST'])
+### UPDATE ITEM
+@block.route('/'+route_pref+'/<uuid:id>', methods=['UPDATE','PATCH','POST'])
 @auth_required()
 @roles_accepted(route_pref)
 def update(id):
@@ -99,7 +111,7 @@ def update(id):
         return redirect(url_for('warehouses.get',id=newItem.id))
 
 ### DELETE ITEM 
-@warehouses.route('/'+route_pref+'/<uuid:id>/delete', methods=['POST','DELETE'])
+@block.route('/'+route_pref+'/<uuid:id>/delete', methods=['POST','DELETE'])
 @auth_required()
 @roles_accepted(route_pref)
 def delete(id):
