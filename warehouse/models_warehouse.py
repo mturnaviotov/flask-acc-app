@@ -1,10 +1,16 @@
 from datetime import date
+
+from dataclasses import dataclass
+from sqlalchemy import inspect
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from ..database import Base
 from typing import List
 from sqlalchemy.orm import relationship, backref, Mapped, mapped_column
 import uuid
 from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey, Uuid
 
+@dataclass
 class Warehouse(Base):
     __tablename__ = 'warehouses'
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
@@ -15,6 +21,7 @@ class Warehouse(Base):
     def __repr__(self):
         return f"{self.name}:{self.id}"        
 
+@dataclass
 class Partner(Base):
     __tablename__ = 'partners'
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
@@ -24,6 +31,7 @@ class Partner(Base):
     def __repr__(self):
         return f"{self.name}:{self.id}"
 
+@dataclass
 class Agreement(Base):
     __tablename__ = 'agreements'
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)
@@ -37,6 +45,7 @@ class Agreement(Base):
     def __repr__(self):
         return f"{self.name}:{self.id}"
 
+@dataclass
 class Good(Base):
     __tablename__ = 'items'
     id = Column(Uuid, default=uuid.uuid4(), primary_key=True)
@@ -45,13 +54,23 @@ class Good(Base):
     units = Column(String(80))
     price = Column(Integer()) # incl VAT
     price_vat = Column(Integer(), default=20)
+#    delivery = relationship('Delivery') 
     delivery_id: Mapped[Uuid] = mapped_column(ForeignKey("deliveries.id"))
     delivery: Mapped["Delivery"] = relationship(back_populates="goods")
-    def to_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    def to_dict(self) -> {}:
+        dict_ = {}
+        for key in self.__mapper__.c.keys():
+            if not key.startswith('_'):
+                dict_[key] = getattr(self, key)
+
+        for key, prop in inspect(self.__class__).all_orm_descriptors.items():
+            if isinstance(prop, hybrid_property):
+                dict_[key] = getattr(self, key)
+        return dict_
     def __repr__(self):
         return f"{self.name}:{self.id}"
 
+@dataclass
 class Delivery(Base):
     __tablename__ = 'deliveries'
     id = Column(Uuid, nullable=False, default=uuid.uuid4(), primary_key=True)

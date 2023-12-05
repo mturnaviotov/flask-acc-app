@@ -3,7 +3,7 @@ from flask_security import current_user, auth_required, permissions_accepted, ro
 
 main = Blueprint('main', __name__)
 
-from .warehouse.models_warehouse import Warehouse
+from .warehouse.models_warehouse import Good
 
 # Views
 
@@ -49,6 +49,7 @@ def board():
 @main.route('/test')
 @auth_required()
 def test():
-    i = Warehouse.query.first()
-    print(list(i.deliveries))
-    return ''
+    i = Good.query.all()
+    items = []
+    for item in i: items.append(item._asdict())
+    return jsonify(items)

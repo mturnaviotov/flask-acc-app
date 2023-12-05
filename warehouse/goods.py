@@ -20,7 +20,7 @@ def index():
     arr = []
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
         for item in all:
-            arr.append(Good.to_dict())
+            arr.append(item.to_dict())
         return jsonify(arr)
     if 'text/html'in request.headers['Accept']:
         return render_template('/'+route_pref+'/index.html', items=all)

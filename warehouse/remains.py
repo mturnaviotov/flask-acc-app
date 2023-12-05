@@ -4,11 +4,11 @@ from flask_security import auth_required, permissions_accepted, roles_accepted
 from markupsafe import escape
 import uuid
 from ..database import db_session
-from .models_warehouse import Delivery
+from .models_warehouse import Good, Delivery
 
-block = Blueprint('deliveries', __name__)
+block = Blueprint('remains', __name__)
 
-route_pref='deliveries'
+route_pref='remains'
 
 ### GET ALL
 
@@ -16,7 +16,8 @@ route_pref='deliveries'
 @auth_required()
 @roles_accepted(route_pref)
 def index():
-    all = Delivery.query.all()
+    all = 
+    #Warehouse.query.all()
     arr = []
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
         for item in all:
@@ -33,7 +34,7 @@ def index():
 def get(id):
     safe = escape(id)
     id = uuid.UUID(safe)
-    item = Delivery.query.filter_by(id=id).first()
+    item = Warehouse.query.filter_by(id=id).first()
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
         return jsonify(item.to_dict())
     elif 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
@@ -41,23 +42,6 @@ def get(id):
     elif 'text/html'in request.headers['Accept']:
         return render_template('/'+route_pref+'/item.html', item=item)
 
-@block.route('/'+route_pref+'/<uuid:id>/goods')
-@auth_required()
-@roles_accepted(route_pref)
-def get_goods(id):
-    safe = escape(id)
-    id = uuid.UUID(safe)
-    goods = Delivery.query.filter_by(id=id).first().goods
-    item = []
-    for good in goods: item.append(good.to_dict())
-    if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
-        return jsonify(item)
-    elif 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
-        return jsonify(item)
-    elif 'text/html'in request.headers['Accept']:
-        return render_template('/'+route_pref+'/items.html', item=item)
-
-####
 ### CREATE ITEM 
 @block.route('/'+route_pref+'/new')
 @auth_required()
@@ -72,7 +56,7 @@ def new():
 def edit(id):
     safe = escape(id)
     id = uuid.UUID(safe)
-    item = Delivery.query.filter_by(id=id).first()
+    item = Warehouse.query.filter_by(id=id).first()
     return render_template('/'+route_pref+'/edit.html', item=item)
 
 @block.route('/'+route_pref+'/', methods = ['POST'])
@@ -83,10 +67,10 @@ def create():
         data = request.form.to_dict()
     if 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
         data = request.get_json()
-    newitem = Delivery(name=escape(data['name']))
+    newitem = Warehouse(name=escape(data['name']))
     db_session.add(newitem)
     db_session.commit()
-    item = Delivery.query.filter_by(name=escape(data['name'])).first()
+    item = Warehouse.query.filter_by(name=escape(data['name'])).first()
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
         return jsonify(item.to_dict())
     elif 'Content-Type' in request.headers and 'application/json' in request.headers['Content-Type']:
@@ -102,7 +86,7 @@ def create():
 def update(id):
     safe = escape(id)
     id = uuid.UUID(safe)
-    item = Delivery.query.filter_by(id=id).first()#.to_dict()
+    item = Warehouse.query.filter_by(id=id).first()#.to_dict()
     dict = item.to_dict()
     db_session.delete(item)
     #s = dict(item.__table__.columns)
@@ -115,7 +99,7 @@ def update(id):
 #        if prop != 'id': item['{prop}'] = data[prop] 
     for field in data:
         dict[field] = escape(data[field])
-    newItem = Delivery(**dict)
+    newItem = Warehouse(**dict)
     db_session.add(newItem)
     db_session.commit()
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
@@ -133,7 +117,7 @@ def update(id):
 def delete(id):
     safe = escape(id)
     id = uuid.UUID(safe)
-    item =Delivery.query.filter_by(id=id).first()
+    item =Warehouse.query.filter_by(id=id).first()
     db_session.delete(item)
     db_session.commit()
     if 'Accept' in request.headers and 'application/json' in request.headers['Accept']:
